@@ -63,7 +63,7 @@ function showError(e){let m=(e&&e.message)||'';if(!m||/Exception|TypeError|Scrip
 function modal(title,html){$('#mb').innerHTML='<h3>'+esc(title)+'</h3>'+html;$('#modal').classList.add('open')}
 function closeModal(){$('#modal').classList.remove('open')}
 $('#modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
-const API_URL='GANTI_DENGAN_URL_WEB_APP_/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbw_Eju928I31ni931s8rrl88uhMPOS6eewoXtrLsAfEbh_OfkDPrTT1oNrrvz9OU5Nb7g/exec';
 function call(fn,args){return fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({fn:fn,args:args})}).then(r=>r.json()).then(r=>{if(!r.ok)throw new Error(r.error);return r.data})}
 function api(fn,...a){return new Promise((ok,no)=>{showLoading();call(fn,[S.token].concat(a)).then(r=>{hideLoading();ok(r)}).catch(e=>{hideLoading();showError(e);no(e)})})}
 const skel=()=>'<div class="sk"></div><div class="sk"></div><div class="sk"></div>';
