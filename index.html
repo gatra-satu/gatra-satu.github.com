@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sistem Administrasi Warga RW</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--p:#1e3a8a;--p2:#2563eb;--bg:#f3f4f6;--b:#e5e7eb;--t:#111827;--m:#6b7280;--ok:#16a34a;--w:#d97706;--er:#dc2626}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--t)}
+button,input,select,textarea{font:inherit}h2{margin:0;font-size:20px}
+.btn{background:var(--p);color:#fff;border:0;border-radius:10px;min-height:44px;padding:0 16px;cursor:pointer;font-weight:600}.btn.g{background:#e5e7eb;color:var(--t)}
+.sm{min-height:36px;padding:0 10px;border:1px solid var(--b);background:#fff;border-radius:8px;cursor:pointer;margin:2px}
+input,select,textarea{width:100%;min-height:44px;padding:8px 12px;border:1px solid #d1d5db;border-radius:10px;background:#fff}
+#side{position:fixed;inset:0 auto 0 0;width:260px;background:var(--p);color:#fff;overflow:auto;z-index:30;transition:transform .25s}
+#side h1{font-size:16px;margin:0;padding:18px 16px;border-bottom:1px solid #fff2}
+#side a{display:block;padding:12px 16px;color:#fff;text-decoration:none;cursor:pointer;min-height:44px}#side a:hover,#side a.on{background:#fff2}
+#side .sub{display:none;background:#0003}#side .sub.open{display:block}#side .sub a{padding-left:40px;font-size:14px}
+main{margin-left:260px}#ham{display:none;background:0;border:0;font-size:24px;cursor:pointer;min-width:44px;min-height:44px}
+.top{position:sticky;top:0;background:#fff;height:56px;display:flex;align-items:center;gap:8px;padding:0 12px;box-shadow:0 1px 3px #0002;z-index:20}.top b{flex:1}
+.top .ic{background:0;border:0;font-size:20px;min-width:44px;min-height:44px;cursor:pointer;position:relative}.dot{position:absolute;top:4px;right:2px;background:var(--er);color:#fff;font-size:11px;border-radius:9px;padding:0 5px}
+#ov{display:none;position:fixed;inset:0;background:#0006;z-index:25}#ov.open{display:block}
+#page{padding:16px;max-width:1200px}.ph{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}.acts{display:flex;gap:8px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:12px}.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 1px 4px #0001}.st b{display:block;font-size:24px;color:var(--p)}.st span{color:var(--m);font-size:13px}
+.pb{height:12px;background:var(--b);border-radius:6px;overflow:hidden;margin:8px 0}.pb i{display:block;height:100%;background:var(--p2)}
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;background:#e5e7eb}.ok{background:#dcfce7;color:#166534}.wn{background:#fef3c7;color:#92400e}.er{background:#fee2e2;color:#991b1b}.bl{background:#dbeafe;color:#1e40af}
+.tw{overflow-x:auto;background:#fff;border-radius:14px;box-shadow:0 1px 4px #0001}table{width:100%;border-collapse:collapse}th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--b);font-size:14px}th{background:#f9fafb;color:var(--m)}
+.srch{margin:8px 0}.flt{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}.flt select{width:auto;min-width:110px}.empty{padding:32px;text-align:center;color:var(--m);background:#fff;border-radius:14px}
+.pager{display:flex;justify-content:space-between;align-items:center;margin:12px 0;color:var(--m);font-size:13px}
+#modal{position:fixed;inset:0;background:#0007;display:none;align-items:center;justify-content:center;z-index:50;padding:12px}#modal.open{display:flex}
+.mb{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:92vh;overflow:auto;padding:18px}.mb h3{margin:0 0 12px}.fg{display:block;margin-bottom:10px}.fg span{display:block;font-size:13px;color:var(--m);margin-bottom:2px}
+.mact{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}.mact .btn{flex:1}
+#toasts{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column;gap:8px;width:90%;max-width:400px}
+.toast{background:#111827;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 4px 12px #0004}.toast.err{background:var(--er)}.toast.ok{background:var(--ok)}
+#bar{position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--p2),#93c5fd,var(--p2));background-size:200%;animation:mv 1s linear infinite;z-index:90}@keyframes mv{to{background-position:200%}}
+.sk{height:90px;border-radius:14px;margin-bottom:12px;background:linear-gradient(90deg,#e5e7eb,#f3f4f6,#e5e7eb);background-size:200%;animation:mv 1.2s linear infinite}
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}#login .card{width:100%;max-width:360px}
+[hidden]{display:none!important}canvas{max-height:260px}
+@media(max-width:900px){#side{transform:translateX(-100%)}#side.open{transform:none}main{margin-left:0}#ham{display:inline-flex;align-items:center;justify-content:center}}
+@media(max-width:768px){.tw{background:0;box-shadow:none}table,tbody,tr,td{display:block;width:100%}thead{display:none}
+tr{background:#fff;border-radius:14px;box-shadow:0 1px 4px #0001;margin-bottom:10px;padding:6px 0}td{display:flex;justify-content:space-between;gap:12px;border:0;padding:6px 14px;text-align:right}
+td::before{content:attr(data-label);color:var(--m);text-align:left;flex-shrink:0}td.ac{justify-content:flex-end;flex-wrap:wrap}td.ac::before{content:none}.mb{max-height:96vh}}
+@media print{#side,.top,.acts,.srch,.flt,#ham{display:none!important}main{margin:0}}
+</style></head><body>
+<div id="bar" hidden></div>
+<div id="login"><form class="card" id="lf"><h2 style="color:var(--p);margin-bottom:4px">SISTEM ADMINISTRASI WARGA RW</h2><p style="color:var(--m);margin-top:0">Silakan login</p>
+<label class="fg"><span>Username</span><input id="lu" autocomplete="username" autocapitalize="none" required></label>
+<label class="fg"><span>Password</span><input id="lp" type="password" autocomplete="current-password" required></label>
+<button class="btn" style="width:100%">Masuk</button></form></div>
+<div id="app" hidden><aside id="side"></aside><div id="ov"></div>
+<main><header class="top"><button id="ham" aria-label="Menu">☰</button><b>SISTEM WARGA</b><button class="ic" id="bell" title="Notifikasi">🔔<span class="dot" id="dot" hidden></span></button><button class="ic" id="usr" title="Pengaturan">👤</button></header><section id="page"></section></main></div>
+<div id="modal"><div class="mb" id="mb"></div></div><div id="toasts"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rp=n=>'Rp'+Number(n||0).toLocaleString('id-ID');
+const BLN=['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const S={token:null,user:null,lk:{rumah:[],warga:[],rt:[],iuran:{}},charts:[],nav:0,page:'dashboard'};
+const ADM=['SUPERADMIN','ADMIN_RW','ADMIN_RT'],RDR=ADM.concat(['BENDAHARA','PETUGAS']),FIN=['SUPERADMIN','ADMIN_RW','BENDAHARA'],ALL=null;
+const isAdm=()=>ADM.includes(S.user.role);
+/* ---------- UI dasar ---------- */
+let lc=0;function showLoading(){lc++;$('#bar').hidden=false}function hideLoading(){lc=Math.max(0,lc-1);if(!lc)$('#bar').hidden=true}
+function showToast(m,t){const e=document.createElement('div');e.className='toast '+(t||'');e.textContent=m;$('#toasts').appendChild(e);setTimeout(()=>e.remove(),3500)}
+function showError(e){let m=(e&&e.message)||'';if(!m||/Exception|TypeError|ScriptError|undefined|at \w+/.test(m)||m.length>160)m='Terjadi kesalahan. Silakan coba lagi.';if(m.indexOf('Sesi')===0){doLogout(true);}showToast('❌ '+m,'err')}
+function modal(title,html){$('#mb').innerHTML='<h3>'+esc(title)+'</h3>'+html;$('#modal').classList.add('open')}
+function closeModal(){$('#modal').classList.remove('open')}
+$('#modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
+const API_URL='GANTI_DENGAN_URL_WEB_APP_/exec';
+function call(fn,args){return fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({fn:fn,args:args})}).then(r=>r.json()).then(r=>{if(!r.ok)throw new Error(r.error);return r.data})}
+function api(fn,...a){return new Promise((ok,no)=>{showLoading();call(fn,[S.token].concat(a)).then(r=>{hideLoading();ok(r)}).catch(e=>{hideLoading();showError(e);no(e)})})}
+const skel=()=>'<div class="sk"></div><div class="sk"></div><div class="sk"></div>';
+const badge=(s,c)=>{const m={AKTIF:'ok',LUNAS:'ok',SELESAI:'ok',DISETUJUI:'ok',NORMAL:'ok',BELUM:'wn',WARNING:'wn',DIVERIFIKASI:'bl',DIAJUKAN:'wn',DITOLAK:'er',EXPIRED:'er',KELUAR:'er',MENINGGAL:'er',TERISI:'ok',KOSONG:'wn'};return '<span class="badge '+(c||m[s]||'')+'">'+esc(s)+'</span>'};
+function readFile(f){return new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok({name:f.name,mime:f.type,data:String(r.result).split(',')[1]});r.onerror=no;r.readAsDataURL(f)})}
+const link=u=>u?'<a href="'+esc(u)+'" target="_blank" rel="noopener">Buka</a>':'-';
+/* ---------- Form & tabel generik ---------- */
+const refLabel=(src,id)=>{const i=(S.lk[src]||[]).find(x=>x.id===id);return i?i.label:''};
+function openForm(o){const f=o.fields,v=o.v||{};
+const h=f.map(x=>{const val=v[x.k]!==undefined?v[x.k]:(x.d||'');const id='f_'+x.k;let i;
+if(x.t==='select')i='<select id="'+id+'">'+x.o.map(op=>{const a=Array.isArray(op)?op[0]:op,b=Array.isArray(op)?op[1]:op;return '<option value="'+esc(a)+'"'+(String(a)===String(val)?' selected':'')+'>'+esc(b)+'</option>'}).join('')+'</select>';
+else if(x.t==='textarea')i='<textarea id="'+id+'" rows="3">'+esc(val)+'</textarea>';
+else if(x.t==='ref')i='<input id="'+id+'" list="dl_'+x.k+'" value="'+esc(refLabel(x.src,val))+'" placeholder="Ketik untuk mencari…" autocomplete="off"><datalist id="dl_'+x.k+'">'+(S.lk[x.src]||[]).map(a=>'<option value="'+esc(a.label)+'">').join('')+'</datalist>';
+else if(x.t==='file')i='<input id="'+id+'" type="file" accept="image/*,application/pdf">';
+else i='<input id="'+id+'" type="'+(x.t||'text')+'" value="'+esc(val)+'"'+(x.m?' maxlength="'+x.m+'"':'')+(x.inp?' inputmode="'+x.inp+'"':'')+'>';
+return '<label class="fg"><span>'+esc(x.l)+(x.r?' *':'')+'</span>'+i+'</label>'}).join('');
+modal(o.title,(o.pre||'')+'<form id="mf">'+h+'<div class="mact"><button type="button" class="btn g" onclick="closeModal()">Batal</button><button class="btn">'+esc(o.btn||'Simpan')+'</button></div></form>');
+$('#mf').onsubmit=async e=>{e.preventDefault();const out={};
+for(const x of f){const el=$('#f_'+x.k);
+if(x.t==='file'){const fl=el.files[0];if(fl){if(fl.size>4*1024*1024){showToast('Ukuran file maksimal 4 MB','err');return}out._file=await readFile(fl)}continue}
+let val=el.value.trim();
+if(x.t==='ref'){const it=(S.lk[x.src]||[]).find(a=>a.label===val);val=it?it.id:'';if(x.r&&!val){showToast('Pilih '+x.l+' dari daftar','err');return}}
+if(x.r&&!val){showToast(x.l+' wajib diisi','err');return}out[x.k]=val}
+try{await o.ok(out);closeModal()}catch(err){}}}
+function table(cols,rows,acts){if(!rows.length)return '<div class="empty">Belum ada data</div>';
+return '<div class="tw"><table><thead><tr>'+cols.map(c=>'<th>'+esc(c.l)+'</th>').join('')+(acts?'<th></th>':'')+'</tr></thead><tbody>'+rows.map((r,i)=>'<tr>'+cols.map(c=>'<td data-label="'+esc(c.l)+'">'+(c.f?c.f(r):esc(r[c.k]))+'</td>').join('')+(acts?'<td class="ac">'+acts.map((a,j)=>(!a.s||a.s(r))?'<button class="sm" data-i="'+i+'" data-a="'+j+'">'+a.l+'</button>':'').join('')+'</td>':'')+'</tr>').join('')+'</tbody></table></div>'}
+function listView(c){const my=S.nav,st={q:'',page:1};let rows=[],tm;
+$('#page').innerHTML='<div class="ph"><h2>'+esc(c.title)+'</h2><div class="acts">'+(c.tools||'')+(c.add?'<button class="btn" id="add">+ '+esc(c.add)+'</button>':'')+'</div></div>'+(c.filters?'<div class="flt">'+c.filters+'</div>':'')+'<div class="srch"><input id="q" type="search" placeholder="🔎 '+esc(c.ph||'Cari…')+'"></div><div id="lv">'+skel()+'</div>';
+const load=async()=>{const base=c.base?c.base():{};let r;try{r=await api(c.fn,Object.assign({},base,{q:st.q,page:st.page,size:10}))}catch(e){if(my===S.nav)$('#lv').innerHTML='<div class="empty">Gagal memuat data.</div>';return}
+if(my!==S.nav)return;rows=r.rows;$('#lv').innerHTML=(c.head?c.head(r):'')+table(c.cols,rows,c.acts)+(r.pages>1||r.total>10?'<div class="pager"><button class="sm" data-pg="-1"'+(r.page<=1?' disabled':'')+'>‹ Sebelumnya</button><span>Hal '+r.page+'/'+r.pages+' · '+r.total+' data</span><button class="sm" data-pg="1"'+(r.page>=r.pages?' disabled':'')+'>Berikutnya ›</button></div>':'<div class="pager"><span>'+r.total+' data</span></div>')};
+$('#q').oninput=e=>{clearTimeout(tm);tm=setTimeout(()=>{st.q=e.target.value;st.page=1;load()},400)};
+document.querySelectorAll('.flt select').forEach(s=>s.onchange=()=>{st.page=1;load()});
+$('#lv').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.pg){st.page+=Number(b.dataset.pg);load()}else if(b.dataset.a!==undefined)c.acts[b.dataset.a].f(rows[b.dataset.i],load)};
+if(c.add)$('#add').onclick=()=>c.addf(load);window.reload=load;load()}
+const selOpts=(a,sel)=>a.map(x=>'<option value="'+x[0]+'"'+(String(x[0])===String(sel)?' selected':'')+'>'+x[1]+'</option>').join('');
+const gv=id=>{const e=$('#'+id);return e?e.value:''};
+/* ---------- Definisi form ---------- */
+const RTOPT=()=>(S.lk.rt.length?S.lk.rt:['01','02','03']);
+const wargaF=()=>[{k:'nik',l:'NIK',r:1,m:16,inp:'numeric'},{k:'no_kk',l:'No KK',r:1,m:16,inp:'numeric'},{k:'nama',l:'Nama',r:1},{k:'jenis_kelamin',l:'Jenis Kelamin',t:'select',o:[['L','Laki-laki'],['P','Perempuan']]},{k:'tempat_lahir',l:'Tempat Lahir'},{k:'tanggal_lahir',l:'Tanggal Lahir',t:'date'},
+{k:'status_keluarga',l:'Status Keluarga',t:'select',o:['KEPALA_KELUARGA','ISTRI','SUAMI','ANAK','ORANG_TUA','LAINNYA'],d:'KEPALA_KELUARGA'},{k:'id_rumah',l:'Rumah',t:'ref',src:'rumah',r:1},{k:'no_hp',l:'No HP',t:'tel',inp:'tel'},{k:'status_warga',l:'Status Warga',t:'select',o:['AKTIF','KELUAR','MENINGGAL']},
+{k:'tanggal_masuk',l:'Tanggal Masuk',t:'date'},{k:'tanggal_keluar',l:'Tanggal Keluar',t:'date'},{k:'keterangan',l:'Keterangan',t:'textarea'},{k:'foto',l:'Foto',t:'file'}];
+const rumahF=()=>[{k:'nomor_rumah',l:'Nomor Rumah',r:1},{k:'blok',l:'Blok'},{k:'rt',l:'RT',t:'select',o:RTOPT()},{k:'rw',l:'RW',d:'01',m:2},{k:'status_rumah',l:'Status Rumah',t:'select',o:['MILIK','KONTRAK','SEWA','KOSONG']},{k:'nama_pemilik',l:'Nama Pemilik'},{k:'catatan',l:'Catatan',t:'textarea'},{k:'foto_rumah',l:'Foto Rumah',t:'file'}];
+const kkF=()=>[{k:'no_kk',l:'No KK',r:1,m:16,inp:'numeric'},{k:'nama_kepala_keluarga',l:'Kepala Keluarga',r:1},{k:'id_rumah',l:'Rumah',t:'ref',src:'rumah',r:1},{k:'alamat',l:'Alamat (opsional)'}];
+const kontrakF=()=>[{k:'id_rumah',l:'Rumah',t:'ref',src:'rumah',r:1},{k:'id_pemilik',l:'Pemilik (warga)',t:'ref',src:'warga'},{k:'id_penghuni',l:'Penghuni (warga)',t:'ref',src:'warga'},{k:'jenis',l:'Jenis',t:'select',o:['KONTRAK','SEWA']},{k:'tanggal_mulai',l:'Tanggal Mulai',t:'date',r:1},{k:'tanggal_selesai',l:'Tanggal Selesai',t:'date',r:1},{k:'no_hp_pemilik',l:'No HP Pemilik',t:'tel'},{k:'no_hp_penghuni',l:'No HP Penghuni',t:'tel'},{k:'status',l:'Status',t:'select',o:['AKTIF','SELESAI']},{k:'keterangan',l:'Keterangan',t:'textarea'},{k:'file_perjanjian',l:'File Perjanjian',t:'file'}];
+const SURAT={DOMISILI:{n:'Surat Domisili',f:[{k:'id_warga',l:'Warga',t:'ref',src:'warga',r:1},{k:'keperluan',l:'Keperluan',r:1}]},
+PENGANTAR:{n:'Surat Pengantar',f:[{k:'id_warga',l:'Warga',t:'ref',src:'warga',r:1},{k:'jenis_keperluan',l:'Jenis Keperluan',r:1},{k:'keterangan',l:'Keterangan',t:'textarea'}]},
+KEMATIAN:{n:'Surat Kematian',f:[{k:'id_warga',l:'Nama Almarhum',t:'ref',src:'warga',r:1},{k:'tanggal_meninggal',l:'Tanggal Meninggal',t:'date',r:1},{k:'jam_meninggal',l:'Jam Meninggal',t:'time'},{k:'tempat_meninggal',l:'Tempat Meninggal'},{k:'pelapor',l:'Pelapor',r:1},{k:'hubungan_pelapor',l:'Hubungan Pelapor'},{k:'keterangan',l:'Keterangan',t:'textarea'}]},
+MASUK:{n:'Warga Masuk',f:[{k:'nama',l:'Nama',r:1},{k:'nik',l:'NIK',r:1,m:16,inp:'numeric'},{k:'no_kk',l:'No KK',m:16,inp:'numeric'},{k:'alamat_asal',l:'Alamat Asal'},{k:'id_rumah',l:'Rumah Tujuan',t:'ref',src:'rumah',r:1},{k:'tanggal_masuk',l:'Tanggal Masuk',t:'date',r:1},{k:'status',l:'Status',t:'select',o:['TETAP','KONTRAK','SEWA']},{k:'pemilik_rumah',l:'Pemilik Rumah'},{k:'no_hp',l:'No HP',t:'tel'}]},
+KELUAR:{n:'Warga Keluar',f:[{k:'id_warga',l:'Warga',t:'ref',src:'warga',r:1},{k:'tanggal_keluar',l:'Tanggal Keluar',t:'date',r:1},{k:'alamat_tujuan',l:'Alamat Tujuan'},{k:'alasan',l:'Alasan'}]},
+KONTRAK:{n:'Kontrak/Sewa',f:[{k:'id_rumah',l:'Rumah',t:'ref',src:'rumah',r:1},{k:'pemilik',l:'Pemilik',r:1},{k:'penghuni',l:'Penghuni',r:1},{k:'jenis',l:'Jenis',t:'select',o:['KONTRAK','SEWA']},{k:'tanggal_mulai',l:'Tanggal Mulai',t:'date',r:1},{k:'tanggal_selesai',l:'Tanggal Selesai',t:'date',r:1},{k:'no_hp',l:'No HP',t:'tel'}]}};
+async function refreshLk(){try{S.lk=await api('getLookup')}catch(e){}}
+function ajukanSurat(j,done){const d=SURAT[j];openForm({title:'Ajukan '+d.n,fields:d.f.concat([{k:'catatan',l:'Catatan (opsional)'}]),btn:'Ajukan',ok:async v=>{const p={jenis:j,id_warga:v.id_warga,id_rumah:v.id_rumah,keperluan:v.keperluan||'',data:v};await api('saveSurat',p);showToast('Surat diajukan','ok');done&&done()}})}
+function pilihJenis(done){modal('Pilih Jenis Surat','<div style="display:grid;gap:8px">'+Object.keys(SURAT).map(k=>'<button class="btn g" data-j="'+k+'">'+SURAT[k].n+'</button>').join('')+'</div>');$('#mb').onclick=e=>{const b=e.target.closest('[data-j]');if(b){closeModal();ajukanSurat(b.dataset.j,done)}}}
+/* ---------- Halaman ---------- */
+const PAGES={};
+PAGES.dashboard=async()=>{const my=S.nav,d=await api('getDashboard');if(my!==S.nav)return;
+const st=(n,l)=>'<div class="card st"><b>'+n+'</b><span>'+l+'</span></div>',sj=d.surat;let h='<h2>Selamat Datang, '+esc(S.user.nama)+'</h2><p style="color:var(--m);margin-top:0">'+BLN[d.bulan]+' '+d.tahun+'</p>';
+if(d.rumah){h+='<div class="grid">'+st(d.rumah.total,'Rumah')+st(d.kk,'KK')+st(d.warga.total,'Warga')+st(d.warga.tetap,'Warga Tetap')+st(d.warga.kontrak,'Warga Kontrak')+st(d.warga.sewa,'Warga Sewa')+st(d.rumah.kosong,'Rumah Kosong')+st(d.rumah.terisi,'Rumah Terisi')+'</div>';
+h+='<div class="grid g2"><div class="card"><b>Iuran '+BLN[d.bulan]+'</b><div style="font-size:22px;color:var(--p);font-weight:700">'+rp(d.iuran.dibayar)+'</div><div class="pb"><i style="width:'+d.iuran.persen+'%"></i></div><span style="color:var(--m)">'+d.iuran.persen+'% dari target '+rp(d.iuran.target)+'<br>Belum dibayar: '+rp(d.iuran.belum)+' · Total tunggakan: '+rp(d.iuran.tunggakan)+'</span></div>';
+h+='<div class="card"><b>Pengajuan Surat</b><p style="margin:6px 0">Baru: '+sj.baru+' · Diproses: '+sj.proses+' · Disetujui: '+sj.disetujui+' · Selesai: '+sj.selesai+'</p>'+Object.keys(sj.perJenis).map(k=>'<div style="display:flex;justify-content:space-between"><span>'+esc((SURAT[k]||{}).n||k)+'</span><b>'+sj.perJenis[k]+'</b></div>').join('')+'</div></div>';
+if(d.keuangan)h+='<div class="grid">'+st(rp(d.keuangan.kas_rt),'Saldo Kas RT')+st(rp(d.keuangan.kas_rw),'Saldo Kas RW')+st(rp(d.keuangan.dana_sosial),'Dana Sosial')+st(rp(d.keuangan.masuk),'Total Pemasukan')+st(rp(d.keuangan.keluar),'Total Pengeluaran')+'</div>';
+h+='<div class="grid g2"><div class="card"><canvas id="c1"></canvas></div><div class="card"><canvas id="c2"></canvas></div><div class="card"><canvas id="c3"></canvas></div><div class="card"><canvas id="c4"></canvas></div>'+(d.keuangan?'<div class="card"><canvas id="c5"></canvas></div>':'')+'</div>'}
+else h+='<div class="grid">'+st(sj.baru,'Diajukan')+st(sj.proses,'Diproses')+st(sj.disetujui,'Disetujui')+st(sj.selesai,'Selesai')+'</div>';
+$('#page').innerHTML=h;const n=(d.surat.baru||0)+(d.kontrakWarning||0);$('#dot').hidden=!n;$('#dot').textContent=n;S.notif=d;
+if(!d.rumah||!window.Chart)return;const mk=(id,type,labels,sets,t)=>{S.charts.push(new Chart($('#'+id),{type:type,data:{labels:labels,datasets:sets},options:{responsive:true,plugins:{title:{display:true,text:t}}}}))},col=['#1e3a8a','#2563eb','#93c5fd','#f59e0b','#10b981'];
+const rt=d.iuran.perRT;mk('c1','bar',rt.map(x=>'RT '+x.rt),[{label:'Target',data:rt.map(x=>x.target),backgroundColor:'#93c5fd'},{label:'Dibayar',data:rt.map(x=>x.dibayar),backgroundColor:'#1e3a8a'}],'Pembayaran per RT');
+mk('c2','bar',rt.map(x=>'RT '+x.rt),[{label:'Tunggakan',data:rt.map(x=>x.tunggakan),backgroundColor:'#dc2626'}],'Tunggakan per RT');
+mk('c3','doughnut',['Tetap','Kontrak','Sewa'],[{data:[d.warga.tetap,d.warga.kontrak,d.warga.sewa],backgroundColor:col}],'Komposisi Warga');
+mk('c4','doughnut',['Milik','Kontrak','Sewa','Kosong'],[{data:[d.rumah.milik,d.rumah.kontrak,d.rumah.sewa,d.rumah.kosong],backgroundColor:col}],'Status Rumah');
+if(d.keuangan)mk('c5','line',d.keuangan.bulanan.map(x=>x.l),[{label:'Pemasukan',data:d.keuangan.bulanan.map(x=>x.masuk),borderColor:'#16a34a'},{label:'Pengeluaran',data:d.keuangan.bulanan.map(x=>x.keluar),borderColor:'#dc2626'}],'Pemasukan vs Pengeluaran')};
+PAGES.warga=v=>{const T={semua:'Semua Warga',kk:'Kepala Keluarga',tetap:'Warga Tetap',kontrak:'Warga Kontrak/Sewa',masuk:'Warga Masuk (90 hari)',keluar:'Warga Keluar'};v=v||'semua';
+listView({title:T[v],fn:'getWarga',base:()=>({view:v}),ph:'Cari nama / NIK / No KK / nomor rumah',add:isAdm()?'Warga':'',addf:l=>openForm({title:'Tambah Warga',fields:wargaF(),ok:async o=>{await api('saveWarga',o);showToast('Warga disimpan','ok');l()}}),
+cols:[{l:'Nama',f:r=>'<b>'+esc(r.nama)+'</b>'},{l:'NIK',k:'nik'},{l:'No KK',k:'no_kk'},{l:'Rumah',k:'rumah'},{l:'RT/RW',f:r=>esc(r.rt+'/'+r.rw)},{l:'Keluarga',f:r=>esc(r.status_keluarga)},{l:'Status',f:r=>badge(r.status_warga)}],
+acts:isAdm()?[{l:'Edit',f:(r,l)=>openForm({title:'Edit Warga',fields:wargaF(),v:r,ok:async o=>{await api('updateWarga',r.id_warga,o);showToast('Tersimpan','ok');l()}})},{l:'Hapus',f:async(r,l)=>{if(confirm('Hapus warga '+r.nama+'?')){await api('deleteWarga',r.id_warga);showToast('Dihapus','ok');l()}}}]:null})};
+PAGES.rumah=()=>listView({title:'Data Rumah',fn:'getRumah',ph:'Cari nomor rumah / blok / pemilik',add:isAdm()?'Rumah':'',addf:l=>openForm({title:'Tambah Rumah',fields:rumahF(),ok:async o=>{await api('saveRumah',o);await refreshLk();showToast('Rumah disimpan','ok');l()}}),
+cols:[{l:'Rumah',f:r=>'<b>'+esc((r.blok?r.blok+'/':'')+r.nomor_rumah)+'</b>'},{l:'RT/RW',f:r=>esc(r.rt+'/'+r.rw)},{l:'Pemilik',k:'nama_pemilik'},{l:'Status',f:r=>badge(r.status_rumah,'bl')},{l:'Hunian',f:r=>badge(r.status_hunian)},{l:'Foto',f:r=>link(r.foto_rumah)}],
+acts:isAdm()?[{l:'Edit',f:(r,l)=>openForm({title:'Edit Rumah',fields:rumahF(),v:r,ok:async o=>{await api('updateRumah',r.id_rumah,o);await refreshLk();showToast('Tersimpan','ok');l()}})}]:null});
+PAGES.kk=()=>listView({title:'Data KK',fn:'getKK',ph:'Cari No KK / kepala keluarga / rumah',add:isAdm()?'KK':'',addf:l=>openForm({title:'Tambah KK',fields:kkF(),ok:async o=>{await api('saveKK',o);showToast('KK disimpan','ok');l()}}),
+cols:[{l:'No KK',k:'no_kk'},{l:'Kepala Keluarga',f:r=>'<b>'+esc(r.nama_kepala_keluarga)+'</b>'},{l:'Rumah',k:'rumah'},{l:'RT/RW',f:r=>esc(r.rt+'/'+r.rw)},{l:'Anggota',k:'jumlah_anggota'}]});
+PAGES.kontrak=()=>listView({title:'Kontrak / Sewa',fn:'getKontrakSewa',ph:'Cari rumah / pemilik / penghuni',add:isAdm()?'Kontrak':'',addf:l=>openForm({title:'Tambah Kontrak/Sewa',fields:kontrakF(),ok:async o=>{await api('saveKontrakSewa',o);showToast('Tersimpan','ok');l()}}),
+cols:[{l:'Rumah',k:'rumah'},{l:'Penghuni',k:'penghuni'},{l:'Pemilik',k:'pemilik'},{l:'Jenis',k:'jenis'},{l:'Periode',f:r=>esc(r.tanggal_mulai+' s/d '+r.tanggal_selesai)},{l:'Indikator',f:r=>badge(r.indikator)+(r.status==='AKTIF'?' <small>'+(r.sisa_hari<0?'lewat '+(-r.sisa_hari)+' hr':r.sisa_hari+' hr lagi')+'</small>':'')},{l:'File',f:r=>link(r.file_perjanjian)}],
+acts:isAdm()?[{l:'Edit',f:(r,l)=>openForm({title:'Edit Kontrak',fields:kontrakF(),v:r,ok:async o=>{await api('updateKontrakSewa',r.id_kontrak,o);showToast('Tersimpan','ok');l()}})}]:null});
+const bayarForm=(r,l)=>{const ik=S.lk.iuran||{};
+openForm({title:'Bayar Iuran – '+r.rumah,pre:'<p>Periode '+BLN[r.bulan]+' '+r.tahun+' · Total <b>'+rp(r.total_tagihan)+'</b></p><details><summary>Rincian</summary>'+Object.keys(ik).map(k=>'<div style="display:flex;justify-content:space-between"><span>'+k.replace(/_/g,' ')+'</span><span>'+rp(ik[k])+'</span></div>').join('')+'</details>',fields:[{k:'metode',l:'Metode',t:'select',o:['CASH','TRANSFER','LAINNYA']},{k:'catatan',l:'Catatan'},{k:'bukti',l:'Bukti (opsional)',t:'file'}],btn:'Catat Pembayaran',ok:async o=>{o.id_tagihan=r.id_tagihan;await api('savePembayaran',o);showToast('Pembayaran dicatat','ok');l()}})};
+PAGES.iuran=v=>{v=v||'tagihan';const y=new Date().getFullYear(),yo=[y-1,y,y+1].map(a=>[a,a]);
+if(v==='rekap')return laporanView('REKAP_IURAN','Rekap Iuran '+y);
+if(v==='pembayaran')return listView({title:'Pembayaran',fn:'getPembayaran',ph:'Cari rumah / petugas',cols:[{l:'Tanggal',k:'tanggal_bayar'},{l:'Rumah',k:'rumah'},{l:'Periode',k:'periode'},{l:'Total',f:r=>rp(r.total_bayar)},{l:'Metode',k:'metode'},{l:'Petugas',k:'petugas'},{l:'Bukti',f:r=>link(r.bukti)}]});
+const tung=v==='tunggakan';
+listView({title:tung?'Tunggakan':'Tagihan Iuran',fn:'getTagihan',ph:'Cari rumah / pemilik / RT',base:()=>({bulan:gv('fb'),tahun:gv('ft'),status:tung?'':gv('fs'),tunggakan:tung}),
+filters:'<select id="fb" class="fl"><option value="">Semua bulan</option>'+selOpts(BLN.map((b,i)=>[i,b]).slice(1),tung?'':new Date().getMonth()+1)+'</select><select id="ft">'+selOpts(yo,y)+'</select>'+(tung?'':'<select id="fs"><option value="">Semua status</option><option>BELUM</option><option>LUNAS</option></select>'),
+head:r=>'<div class="card" style="margin-bottom:10px">Total ditampilkan: <b>'+rp(r.sum)+'</b> ('+r.total+' tagihan)</div>',
+tools:FIN.includes(S.user.role)?'<button class="btn g" id="gen">⚙️ Buat Tagihan</button>':'',
+cols:[{l:'Rumah',f:r=>'<b>'+esc(r.rumah)+'</b>'},{l:'RT',k:'rt'},{l:'Pemilik',k:'pemilik'},{l:'Periode',f:r=>BLN[r.bulan]+' '+r.tahun},{l:'Total',f:r=>rp(r.total_tagihan)},{l:'Jatuh Tempo',k:'tanggal_jatuh_tempo'},{l:'Status',f:r=>r.terlambat?badge('TERLAMBAT','er'):badge(r.status)}],
+acts:[{l:'Bayar',s:r=>r.status!=='LUNAS',f:bayarForm}]});
+const g=$('#gen');if(g)g.onclick=()=>openForm({title:'Buat Tagihan Bulanan',fields:[{k:'bulan',l:'Bulan',t:'select',o:BLN.map((b,i)=>[i,b]).slice(1),d:new Date().getMonth()+1},{k:'tahun',l:'Tahun',t:'number',d:y}],btn:'Buat',ok:async o=>{const r=await api('generateTagihanBulanan',o);showToast(r.dibuat+' tagihan dibuat','ok');window.reload()}})};
+PAGES.keuangan=async v=>{v=v||'pemasukan';const my=S.nav,pos=['kas_rt','kas_rw','dana_sosial'].includes(v)?v:'';const k=await api('getKeuangan',{pos:pos});if(my!==S.nav)return;
+let h='<div class="ph"><h2>Keuangan'+(pos?' – '+pos.replace(/_/g,' ').toUpperCase():'')+'</h2><div class="acts"><button class="btn" id="out">+ Pengeluaran</button></div></div><div class="grid">'+Object.keys(k.saldo.pos).map(p=>'<div class="card st"><b>'+rp(k.saldo.pos[p].saldo)+'</b><span>'+p.replace(/_/g,' ')+'</span></div>').join('')+'</div>';
+if(v!=='pengeluaran')h+='<h3>Pemasukan terbaru</h3>'+table([{l:'Tanggal',k:'tanggal'},{l:'Rumah',k:'rumah'},{l:'Jumlah',f:r=>rp(r.jumlah)},{l:'Metode',k:'metode'},{l:'Petugas',k:'petugas'}],k.pemasukan);
+if(v!=='pemasukan')h+='<h3>Pengeluaran</h3>'+table([{l:'Tanggal',k:'tanggal'},{l:'Pos',f:r=>esc(r.pos.replace(/_/g,' '))},{l:'Keterangan',k:'keterangan'},{l:'Jumlah',f:r=>rp(r.jumlah)},{l:'Bukti',f:r=>link(r.bukti)}],k.pengeluaran);
+$('#page').innerHTML=h;$('#out').onclick=()=>openForm({title:'Catat Pengeluaran',fields:[{k:'tanggal',l:'Tanggal',t:'date',r:1,d:new Date().toISOString().slice(0,10)},{k:'pos',l:'Pos Dana',t:'select',o:k.pos.map(p=>[p,p.replace(/_/g,' ')]),d:pos||'kas_rt'},{k:'keterangan',l:'Keterangan',r:1},{k:'jumlah',l:'Jumlah (Rp)',t:'number',r:1,inp:'numeric'},{k:'bukti',l:'Bukti',t:'file'}],ok:async o=>{await api('savePengeluaran',o);showToast('Pengeluaran dicatat','ok');showPage('keuangan',v)}})};
+PAGES.surat=j=>{j=j&&SURAT[j]?j:'';const A=[];
+['DIVERIFIKASI','DISETUJUI','DITOLAK'].forEach(s=>A.push({l:{DIVERIFIKASI:'Verifikasi',DISETUJUI:'Setujui',DITOLAK:'Tolak'}[s],s:r=>S.user.role!=='WARGA'&&(s==='DIVERIFIKASI'?r.status==='DIAJUKAN'&&RDR.includes(S.user.role):s==='DISETUJUI'?r.status==='DIVERIFIKASI'&&isAdm():(r.status==='DIAJUKAN'||r.status==='DIVERIFIKASI')&&isAdm()),
+f:async(r,l)=>{let c='';if(s==='DITOLAK'){c=prompt('Alasan penolakan?');if(c===null)return}await api('updateStatusSurat',r.id_surat,s,c);showToast('Status: '+s,'ok');l()}}));
+A.push({l:'📄 PDF',s:r=>isAdm()&&(r.status==='DISETUJUI'||r.status==='SELESAI'),f:async(r,l)=>{const x=await api('generateSuratPDF',r.id_surat);modal('PDF Siap','<p>'+esc(r.nomor_surat)+'</p><a class="btn" style="display:flex;align-items:center;justify-content:center;text-decoration:none" target="_blank" rel="noopener" href="'+esc(x.url)+'">Buka PDF</a>');l()}});
+listView({title:j?SURAT[j].n:'Pengajuan Surat',fn:'getSurat',base:()=>({jenis:j,status:gv('fs')}),ph:'Cari nomor / nama / status',add:'Ajukan',addf:l=>j?ajukanSurat(j,l):pilihJenis(l),
+filters:'<select id="fs"><option value="">Semua status</option>'+['DIAJUKAN','DIVERIFIKASI','DISETUJUI','DITOLAK','SELESAI'].map(s=>'<option>'+s+'</option>').join('')+'</select>',
+cols:[{l:'Nomor',f:r=>'<b>'+esc(r.nomor_surat)+'</b>'},{l:'Jenis',f:r=>esc((SURAT[r.jenis_surat]||{}).n||r.jenis_surat)},{l:'Nama',k:'nama'},{l:'Tanggal',k:'tanggal_pengajuan'},{l:'Status',f:r=>badge(r.status)},{l:'Catatan',k:'catatan'}],acts:A})};
+PAGES.dokumen=()=>listView({title:'Dokumen',fn:'getDokumen',ph:'Cari judul / kategori',add:'Upload',addf:l=>openForm({title:'Upload Dokumen',fields:[{k:'kategori',l:'Kategori',t:'select',o:['DOKUMEN_WARGA','FOTO_WARGA','FOTO_RUMAH','KONTRAK_SEWA','BUKTI_IURAN']},{k:'judul',l:'Judul',r:1},{k:'file',l:'File',t:'file'}],ok:async o=>{if(!o._file){showToast('Pilih file','err');throw 0}await api('saveDokumen',o);showToast('Terupload','ok');l()}}),
+cols:[{l:'Judul',f:r=>'<b>'+esc(r.judul)+'</b>'},{l:'Kategori',k:'kategori'},{l:'Oleh',k:'petugas'},{l:'Tanggal',f:r=>esc(String(r.created_at).slice(0,10))},{l:'File',f:r=>link(r.file_url)}],
+acts:isAdm()?[{l:'Hapus',f:async(r,l)=>{if(confirm('Hapus dokumen?')){await api('deleteDokumen',r.id_dokumen);l()}}}]:null});
+async function laporanView(jenis,title){const my=S.nav,r=await api('getLaporan',{jenis:jenis,tahun:gv('lt')||new Date().getFullYear()});if(my!==S.nav)return;
+$('#page').innerHTML='<div class="ph"><h2>'+esc(title)+'</h2><div class="acts"><button class="btn g" id="csv">⬇ CSV</button><button class="btn g" onclick="print()">🖨 Cetak</button></div></div>'+(r.rows.length?'<div class="tw"><table><thead><tr>'+r.cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+r.rows.map(x=>'<tr>'+x.map((c,i)=>'<td data-label="'+esc(r.cols[i])+'">'+esc(typeof c==='number'&&c>999?rp(c):c)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>':'<div class="empty">Belum ada data</div>');
+$('#csv').onclick=()=>{const q=v=>'"'+String(v).replace(/"/g,'""')+'"',t=[r.cols].concat(r.rows).map(x=>x.map(q).join(',')).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+t],{type:'text/csv'}));a.download=jenis+'.csv';a.click()}}
+PAGES.laporan=v=>{v=v||'REKAP_IURAN';const T={REKAP_IURAN:'Rekap Iuran',TUNGGAKAN:'Tunggakan',WARGA:'Statistik Warga',KEUANGAN:'Keuangan'};
+laporanView(v,'Laporan: '+T[v]).then(()=>{const b=document.createElement('div');b.className='flt';b.innerHTML='<select id="lj">'+Object.keys(T).filter(k=>k!=='KEUANGAN'||FIN.includes(S.user.role)).map(k=>'<option value="'+k+'"'+(k===v?' selected':'')+'>'+T[k]+'</option>').join('')+'</select>';$('#page').insertBefore(b,$('#page').children[1]);$('#lj').onchange=e=>showPage('laporan',e.target.value)})};
+PAGES.pengaturan=()=>{const u=S.user;let h='<div class="ph"><h2>Pengaturan</h2></div><div class="card"><b>'+esc(u.nama)+'</b><br><span style="color:var(--m)">@'+esc(u.username)+' · '+esc(u.role)+(u.rt?' · RT '+esc(u.rt):'')+'</span><div class="acts" style="margin-top:10px"><button class="btn" id="cp">Ganti Password</button><button class="btn g" id="lo">Keluar</button></div></div>';
+if(['SUPERADMIN','ADMIN_RW'].includes(u.role))h+='<div class="grid" style="margin-top:12px"><button class="btn g" id="gu">👥 Kelola Pengguna</button><button class="btn g" id="gl">🧾 Log Aktivitas</button></div>';
+$('#page').innerHTML=h;$('#lo').onclick=()=>doLogout();
+$('#cp').onclick=()=>openForm({title:'Ganti Password',fields:[{k:'a',l:'Password Lama',t:'password',r:1},{k:'b',l:'Password Baru (min 8)',t:'password',r:1}],ok:async o=>{await api('changePassword',o.a,o.b);showToast('Password diganti','ok')}});
+if($('#gu'))$('#gu').onclick=()=>showPage('users');if($('#gl'))$('#gl').onclick=()=>showPage('log')};
+const userF=e=>[{k:'username',l:'Username',r:1},{k:'nama',l:'Nama',r:1},{k:'role',l:'Role',t:'select',o:['ADMIN_RW','ADMIN_RT','BENDAHARA','PETUGAS','WARGA'].concat(S.user.role==='SUPERADMIN'?['SUPERADMIN']:[])},{k:'rt',l:'RT (untuk ADMIN_RT)',m:2},{k:'status',l:'Status',t:'select',o:['AKTIF','NONAKTIF']},{k:'password',l:e?'Password baru (kosongkan jika tidak diubah)':'Password (min 8)',t:'password',r:!e}];
+PAGES.users=()=>listView({title:'Pengguna',fn:'getUsers',ph:'Cari username / nama / role',add:'Pengguna',addf:l=>openForm({title:'Tambah Pengguna',fields:userF(0),ok:async o=>{await api('saveUser',o);showToast('Pengguna dibuat','ok');l()}}),
+cols:[{l:'Username',f:r=>'<b>'+esc(r.username)+'</b>'},{l:'Nama',k:'nama'},{l:'Role',k:'role'},{l:'RT',k:'rt'},{l:'Status',f:r=>badge(r.status)}],
+acts:[{l:'Edit',f:(r,l)=>openForm({title:'Edit Pengguna',fields:userF(1).filter(f=>f.k!=='username'),v:r,ok:async o=>{await api('updateUser',r.id_user,o);showToast('Tersimpan','ok');l()}})}]});
+PAGES.log=()=>listView({title:'Log Aktivitas',fn:'getLogAktivitas',ph:'Cari user / aksi / modul',cols:[{l:'Waktu',k:'timestamp'},{l:'User',k:'user'},{l:'Role',k:'role'},{l:'Aksi',f:r=>badge(r.action,'bl')},{l:'Modul',k:'module'},{l:'Keterangan',k:'description'}]});
+/* ---------- Navigasi ---------- */
+const WS=[['Semua Warga','warga','semua'],['Kepala Keluarga','warga','kk'],['Warga Tetap','warga','tetap'],['Warga Kontrak/Sewa','warga','kontrak'],['Warga Masuk','warga','masuk'],['Warga Keluar','warga','keluar']];
+const NAV=[{i:'🏠',t:'Dashboard',p:'dashboard'},{i:'👨‍👩‍👧',t:'Data Warga',r:RDR,s:WS},{i:'🏘️',t:'Data Rumah',p:'rumah',r:RDR},{i:'📇',t:'Data KK',p:'kk',r:RDR},{i:'📝',t:'Kontrak/Sewa',p:'kontrak',r:RDR},
+{i:'💰',t:'Iuran',r:RDR,s:[['Tagihan','iuran','tagihan'],['Pembayaran','iuran','pembayaran'],['Tunggakan','iuran','tunggakan'],['Rekap Iuran','iuran','rekap']]},
+{i:'💵',t:'Keuangan',r:FIN,s:[['Kas RT','keuangan','kas_rt'],['Kas RW','keuangan','kas_rw'],['Dana Sosial','keuangan','dana_sosial'],['Pemasukan','keuangan','pemasukan'],['Pengeluaran','keuangan','pengeluaran']]},
+{i:'📄',t:'Surat Menyurat',s:[['Pengajuan Surat','surat',''],['Surat Domisili','surat','DOMISILI'],['Surat Pengantar','surat','PENGANTAR'],['Surat Kematian','surat','KEMATIAN'],['Warga Masuk','surat','MASUK'],['Warga Keluar','surat','KELUAR'],['Kontrak/Sewa','surat','KONTRAK']]},
+{i:'📁',t:'Dokumen',p:'dokumen',r:RDR},{i:'📊',t:'Laporan',p:'laporan',r:RDR},{i:'⚙️',t:'Pengaturan',p:'pengaturan'}];
+function buildNav(){const ok=n=>!n.r||n.r.includes(S.user.role);
+$('#side').innerHTML='<h1>🏘️ ADMINISTRASI WARGA RW</h1>'+NAV.filter(ok).map((n,x)=>n.s?'<a data-x="'+x+'">'+n.i+' '+n.t+' ▾</a><div class="sub" id="sub'+x+'">'+n.s.map(s=>'<a data-p="'+s[1]+'" data-a="'+s[2]+'">'+s[0]+'</a>').join('')+'</div>':'<a data-p="'+n.p+'">'+n.i+' '+n.t+'</a>').join('');
+$('#side').onclick=e=>{const a=e.target.closest('a');if(!a)return;if(a.dataset.x!==undefined)$('#sub'+a.dataset.x).classList.toggle('open');else showPage(a.dataset.p,a.dataset.a)}}
+function closeNav(){$('#side').classList.remove('open');$('#ov').classList.remove('open')}
+$('#ham').onclick=()=>{$('#side').classList.add('open');$('#ov').classList.add('open')};$('#ov').onclick=closeNav;
+function showPage(p,a){S.nav++;S.page=p;S.charts.forEach(c=>c.destroy());S.charts=[];closeNav();
+document.querySelectorAll('#side a').forEach(x=>x.classList.toggle('on',x.dataset.p===p&&(x.dataset.a===undefined||x.dataset.a===(a||''))));
+$('#page').innerHTML=skel();scrollTo(0,0);try{const r=(PAGES[p]||PAGES.dashboard)(a);if(r&&r.catch)r.catch(()=>{$('#page').innerHTML='<div class="empty">Gagal memuat halaman. Silakan coba lagi.</div>'})}catch(e){showError(e)}}
+$('#bell').onclick=()=>{const d=S.notif||{};const s=d.surat||{};modal('Notifikasi','<p>📄 Pengajuan surat baru: <b>'+(s.baru||0)+'</b></p><p>📝 Kontrak berakhir ≤30 hari: <b>'+(d.kontrakWarning||0)+'</b></p><div class="mact"><button class="btn" onclick="closeModal();showPage(\'surat\')">Lihat Surat</button></div>')};
+$('#usr').onclick=()=>showPage('pengaturan');
+/* ---------- Login ---------- */
+function enter(){$('#login').hidden=true;$('#app').hidden=false;buildNav();refreshLk().then(()=>showPage('dashboard'))}
+function doLogout(silent){if(!silent&&S.token)call('logout',[S.token]).catch(()=>{});S.token=null;try{sessionStorage.removeItem('tk')}catch(e){}$('#app').hidden=true;$('#login').hidden=false;$('#lp').value=''}
+$('#lf').onsubmit=e=>{e.preventDefault();showLoading();call('login',[$('#lu').value,$('#lp').value]).then(r=>{hideLoading();S.token=r.token;S.user=r.user;try{sessionStorage.setItem('tk',r.token)}catch(x){}enter()}).catch(er=>{hideLoading();showError(er)})};
+(function(){let t=null;try{t=sessionStorage.getItem('tk')}catch(e){}if(!t)return;S.token=t;showLoading();call('me',[t]).then(u=>{hideLoading();S.user=u;enter()}).catch(()=>{hideLoading();doLogout(true)})})();
+</script></body></html>
