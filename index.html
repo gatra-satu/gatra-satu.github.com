@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sistem Administrasi Warga RW</title>
+<title>Sistem ADMINISTRASI WARGA GATRA-1</title>
 <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -74,7 +74,7 @@ input[type=file]::file-selector-button{background:var(--p);color:#fff;border:0;b
 </style></head><body>
 <div id="bar" hidden><i id="barfill"></i></div><div id="chip" hidden></div>
 <div id="prog" hidden><div class="pc"><div id="ptxt">Memproses…</div><div class="pbar"><i id="pfill"></i></div><div id="ppct">0%</div></div></div>
-<div id="login"><form class="card" id="lf"><h2 style="color:var(--p);margin-bottom:4px">SISTEM ADMINISTRASI WARGA RW</h2><p style="color:var(--m);margin-top:0">Silakan login</p>
+<div id="login"><form class="card" id="lf"><h2 style="color:var(--p);margin-bottom:4px">SISTEM ADMINISTRASI WARGA GATRA-1</h2><p style="color:var(--m);margin-top:0">Silakan login</p>
 <label class="fg"><span>Username</span><input id="lu" autocomplete="username" autocapitalize="none" required></label>
 <label class="fg"><span>Password</span><input id="lp" type="password" autocomplete="current-password" required></label>
 <button class="btn" style="width:100%">Masuk</button><p style="text-align:center;margin:14px 0 0"><a href="#" id="lupa">Lupa password?</a></p></form></div>
@@ -365,7 +365,7 @@ const NAV=[{i:'🏠',t:'Dashboard',p:'dashboard'},{i:'💬',t:'Ruang Obrolan',p:
 {i:'📄',t:'Surat Menyurat',s:[['Pengajuan Surat','surat',''],['Surat Domisili','surat','DOMISILI'],['Surat Pengantar','surat','PENGANTAR'],['Surat Kematian','surat','KEMATIAN'],['Warga Masuk','surat','MASUK'],['Warga Keluar','surat','KELUAR'],['Kontrak/Sewa','surat','KONTRAK']]},
 {i:'📁',t:'Dokumen',p:'dokumen',r:RDR},{i:'📊',t:'Laporan',p:'laporan',r:RDR},{i:'⚙️',t:'Pengaturan',p:'pengaturan'}];
 function buildNav(){const ok=n=>!n.r||n.r.includes(S.user.role);
-$('#side').innerHTML='<h1>🏘️ ADMINISTRASI WARGA RW</h1>'+NAV.filter(ok).map((n,x)=>n.s?'<a data-x="'+x+'">'+n.i+' '+n.t+' ▾</a><div class="sub" id="sub'+x+'">'+n.s.map(s=>'<a data-p="'+s[1]+'" data-a="'+s[2]+'">'+s[0]+'</a>').join('')+'</div>':'<a data-p="'+n.p+'">'+n.i+' '+n.t+(n.p==='chat'?' <span class="nb" id="cb" hidden></span>':'')+'</a>').join('');
+$('#side').innerHTML='<h1>🏘️ ADMINISTRASI WARGA GATRA-1</h1>'+NAV.filter(ok).map((n,x)=>n.s?'<a data-x="'+x+'">'+n.i+' '+n.t+' ▾</a><div class="sub" id="sub'+x+'">'+n.s.map(s=>'<a data-p="'+s[1]+'" data-a="'+s[2]+'">'+s[0]+'</a>').join('')+'</div>':'<a data-p="'+n.p+'">'+n.i+' '+n.t+(n.p==='chat'?' <span class="nb" id="cb" hidden></span>':'')+'</a>').join('');
 $('#side').onclick=e=>{const a=e.target.closest('a');if(!a)return;if(a.dataset.x!==undefined)$('#sub'+a.dataset.x).classList.toggle('open');else showPage(a.dataset.p,a.dataset.a)}}
 function closeNav(){$('#side').classList.remove('open');$('#ov').classList.remove('open')}
 $('#ham').onclick=()=>{$('#side').classList.add('open');$('#ov').classList.add('open')};$('#ov').onclick=closeNav;
