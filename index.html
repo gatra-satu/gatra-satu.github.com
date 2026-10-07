@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sistem ADMINISTRASI WARGA GATRA-1</title>
+<title>Sistem Administrasi Warga RW</title>
 <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{--p:#1e3a8a;--p2:#2563eb;--bg:#f3f4f6;--b:#e5e7eb;--t:#111827;--m:#6b7280;--ok:#16a34a;--w:#d97706;--er:#dc2626}
 *{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--t)}
@@ -69,10 +70,11 @@ input[type=file]::file-selector-button{background:var(--p);color:#fff;border:0;b
 .cc{display:flex;gap:8px;padding:10px;border-top:1px solid var(--b);align-items:flex-end}.cc textarea{min-height:44px;max-height:120px;resize:none;flex:1}.ic2{background:#f3f4f6;border:0;border-radius:10px;min-width:44px;min-height:44px;font-size:20px;cursor:pointer}
 @media(max-width:900px){.chat{height:calc(100vh - 100px);height:calc(100dvh - 100px)}}
 .paper{background:#fff;border:1px solid #cbd5e1;box-shadow:0 1px 6px #0002;padding:18px;font-family:'Times New Roman',serif;font-size:14px;max-height:52vh;overflow:auto;border-radius:6px;margin:10px 0}.paper hr{border:0;border-top:2px solid #111;margin:8px 0}.pvn{font-size:12px;color:var(--m)}
+.xt{width:100%;border-collapse:collapse;font-size:13px}.xt td{padding:4px 6px;border-bottom:1px solid var(--b)}.xr{max-height:38vh;overflow:auto;margin:8px 0}
 </style></head><body>
 <div id="bar" hidden><i id="barfill"></i></div><div id="chip" hidden></div>
 <div id="prog" hidden><div class="pc"><div id="ptxt">Memproses…</div><div class="pbar"><i id="pfill"></i></div><div id="ppct">0%</div></div></div>
-<div id="login"><form class="card" id="lf"><h2 style="color:var(--p);margin-bottom:4px">SISTEM ADMINISTRASI WARGA GATRA-1</h2><p style="color:var(--m);margin-top:0">Silakan login</p>
+<div id="login"><form class="card" id="lf"><h2 style="color:var(--p);margin-bottom:4px">SISTEM ADMINISTRASI WARGA RW</h2><p style="color:var(--m);margin-top:0">Silakan login</p>
 <label class="fg"><span>Username</span><input id="lu" autocomplete="username" autocapitalize="none" required></label>
 <label class="fg"><span>Password</span><input id="lp" type="password" autocomplete="current-password" required></label>
 <button class="btn" style="width:100%">Masuk</button><p style="text-align:center;margin:14px 0 0"><a href="#" id="lupa">Lupa password?</a></p></form></div>
@@ -189,13 +191,13 @@ mk('c3','doughnut',['Tetap','Kontrak','Sewa'],[{data:[d.warga.tetap,d.warga.kont
 mk('c4','doughnut',['Milik','Kontrak','Sewa','Kosong'],[{data:[d.rumah.milik,d.rumah.kontrak,d.rumah.sewa,d.rumah.kosong],backgroundColor:col}],'Status Rumah');
 if(d.keuangan)mk('c5','line',d.keuangan.bulanan.map(x=>x.l),[{label:'Pemasukan',data:d.keuangan.bulanan.map(x=>x.masuk),borderColor:'#16a34a'},{label:'Pengeluaran',data:d.keuangan.bulanan.map(x=>x.keluar),borderColor:'#dc2626'}],'Pemasukan vs Pengeluaran')};
 PAGES.warga=v=>{const T={semua:'Semua Warga',kk:'Kepala Keluarga',tetap:'Warga Tetap',kontrak:'Warga Kontrak/Sewa',masuk:'Warga Masuk (90 hari)',keluar:'Warga Keluar'};v=v||'semua';
-listView({title:T[v],fn:'getWarga',base:()=>({view:v}),ph:'Cari nama / NIK / No KK / nomor rumah',add:isAdm()?'Warga':'',addf:l=>openForm({title:'Tambah Warga',fields:wargaF(),ok:async o=>{await api('saveWarga',o);showToast('Warga disimpan','ok');l()}}),
+lvx('WARGA',{title:T[v],fn:'getWarga',base:()=>({view:v}),ph:'Cari nama / NIK / No KK / nomor rumah',add:isAdm()?'Warga':'',addf:l=>openForm({title:'Tambah Warga',fields:wargaF(),ok:async o=>{await api('saveWarga',o);showToast('Warga disimpan','ok');l()}}),
 cols:[{l:'Nama',f:r=>'<b>'+esc(r.nama)+'</b>'},{l:'NIK',k:'nik'},{l:'No KK',k:'no_kk'},{l:'Rumah',k:'rumah'},{l:'RT/RW',f:r=>esc(r.rt+'/'+r.rw)},{l:'Keluarga',f:r=>esc(r.status_keluarga)},{l:'Status',f:r=>badge(r.status_warga)}],
 acts:isAdm()?[{l:'Edit',f:(r,l)=>openForm({title:'Edit Warga',fields:wargaF(),v:r,ok:async o=>{await api('updateWarga',r.id_warga,o);showToast('Tersimpan','ok');l()}})},{l:'Hapus',f:async(r,l)=>{if(confirm('Hapus warga '+r.nama+'?')){await api('deleteWarga',r.id_warga);showToast('Dihapus','ok');l()}}}]:null})};
-PAGES.rumah=()=>listView({title:'Data Rumah',fn:'getRumah',ph:'Cari nomor rumah / blok / pemilik',add:isAdm()?'Rumah':'',addf:l=>openForm({title:'Tambah Rumah',fields:rumahF(),ok:async o=>{await api('saveRumah',o);await refreshLk();showToast('Rumah disimpan','ok');l()}}),
+PAGES.rumah=()=>lvx('RUMAH',{title:'Data Rumah',fn:'getRumah',ph:'Cari nomor rumah / blok / pemilik',add:isAdm()?'Rumah':'',addf:l=>openForm({title:'Tambah Rumah',fields:rumahF(),ok:async o=>{await api('saveRumah',o);await refreshLk();showToast('Rumah disimpan','ok');l()}}),
 cols:[{l:'Rumah',f:r=>'<b>'+esc((r.blok?r.blok+'/':'')+r.nomor_rumah)+'</b>'},{l:'RT/RW',f:r=>esc(r.rt+'/'+r.rw)},{l:'Pemilik',k:'nama_pemilik'},{l:'Status',f:r=>badge(r.status_rumah,'bl')},{l:'Hunian',f:r=>badge(r.status_hunian)},{l:'Foto',f:r=>link(r.foto_rumah)}],
 acts:isAdm()?[{l:'Edit',f:(r,l)=>openForm({title:'Edit Rumah',fields:rumahF(),v:r,ok:async o=>{await api('updateRumah',r.id_rumah,o);await refreshLk();showToast('Tersimpan','ok');l()}})}]:null});
-PAGES.kk=()=>listView({title:'Data KK',fn:'getKK',ph:'Cari No KK / kepala keluarga / rumah',add:isAdm()?'KK':'',addf:l=>openForm({title:'Tambah KK',fields:kkF(),ok:async o=>{await api('saveKK',o);showToast('KK disimpan','ok');l()}}),
+PAGES.kk=()=>lvx('KK',{title:'Data KK',fn:'getKK',ph:'Cari No KK / kepala keluarga / rumah',add:isAdm()?'KK':'',addf:l=>openForm({title:'Tambah KK',fields:kkF(),ok:async o=>{await api('saveKK',o);showToast('KK disimpan','ok');l()}}),
 cols:[{l:'No KK',k:'no_kk'},{l:'Kepala Keluarga',f:r=>'<b>'+esc(r.nama_kepala_keluarga)+'</b>'},{l:'Rumah',k:'rumah'},{l:'RT/RW',f:r=>esc(r.rt+'/'+r.rw)},{l:'Anggota',k:'jumlah_anggota'}]});
 PAGES.kontrak=()=>listView({title:'Kontrak / Sewa',fn:'getKontrakSewa',ph:'Cari rumah / pemilik / penghuni',add:isAdm()?'Kontrak':'',addf:l=>openForm({title:'Tambah Kontrak/Sewa',fields:kontrakF(),ok:async o=>{await api('saveKontrakSewa',o);showToast('Tersimpan','ok');l()}}),
 cols:[{l:'Rumah',k:'rumah'},{l:'Penghuni',k:'penghuni'},{l:'Pemilik',k:'pemilik'},{l:'Jenis',k:'jenis'},{l:'Periode',f:r=>esc(r.tanggal_mulai+' s/d '+r.tanggal_selesai)},{l:'Indikator',f:r=>badge(r.indikator)},{l:'Hitung Mundur',f:r=>r.status==='AKTIF'?cdSpan(r.tanggal_selesai):'-'},{l:'File',f:r=>link(r.file_perjanjian)}],
@@ -274,6 +276,54 @@ head:()=>'<div class="card" style="margin-bottom:10px">Verifikasi identitas warg
 cols:[{l:'Diminta',f:r=>esc(String(r.created_at).slice(0,16))},{l:'Nama',f:r=>'<b>'+esc(r.nama)+'</b>'},{l:'Username',k:'username'},{l:'Rumah',k:'rumah'},{l:'RT',k:'rt'},{l:'No HP',k:'no_hp'},{l:'Status',f:r=>badge(r.status)},{l:'Catatan',k:'catatan'}],
 acts:[{l:'✔ Setujui',s:r=>r.status==='MENUNGGU',f:async(r,l)=>{if(!confirm('Apakah Anda sudah memverifikasi identitas '+r.nama+' ('+r.rumah+')? Password sementara akan dibuat.'))return;const x=await api('prosesReset',r.id_reset,'TERIMA','');modal('Password Sementara','<p>Berikan kepada <b>'+esc(r.nama)+'</b> (@'+esc(x.username)+'):</p><div class="card" style="font-size:22px;font-weight:700;text-align:center;letter-spacing:1px;user-select:all">'+esc(x.password)+'</div><p style="color:var(--m);font-size:13px">Password hanya tampil sekali. Warga wajib menggantinya saat login pertama.</p><div class="mact"><button class="btn" onclick="closeModal()">Tutup</button></div>');l()}},
 {l:'✖ Tolak',s:r=>r.status==='MENUNGGU',f:async(r,l)=>{const c=prompt('Alasan penolakan?');if(!c)return;await api('prosesReset',r.id_reset,'TOLAK',c);showToast('Permintaan ditolak','ok');l()}}]});
+/* ---------- Export / Import Excel ---------- */
+const XL={
+RUMAH:{n:'Data Rumah',cols:['blok','nomor_rumah','rt','rw','status_rumah','nama_pemilik','catatan'],text:['blok','nomor_rumah','rt','rw'],date:[],key:r=>[r.blok,r.nomor_rumah,r.rt].join('|').toUpperCase(),
+help:['blok, nomor_rumah, rt: identitas rumah (kombinasi harus unik).','rt dan rw ditulis dua digit, contoh 01 atau 05. rw kosong = RW bawaan sistem.','status_rumah: MILIK, KONTRAK, SEWA, KOSONG (kosong = MILIK).','Contoh: A | 12 | 01 | 05 | MILIK | Budi Santoso | -']},
+KK:{n:'Data KK',cols:['no_kk','nama_kepala_keluarga','blok','nomor_rumah','rt','alamat'],text:['no_kk','blok','nomor_rumah','rt'],date:[],key:r=>r.no_kk,
+help:['no_kk: 16 digit (format Teks).','blok, nomor_rumah, rt: harus sama dengan Data Rumah (lihat sheet Daftar Rumah). Impor Data Rumah lebih dulu.','alamat boleh kosong (diisi otomatis dari rumah).','Contoh: 3329100000000001 | Budi Santoso | A | 12 | 01']},
+WARGA:{n:'Data Warga',cols:['nik','no_kk','nama','jenis_kelamin','tempat_lahir','tanggal_lahir','status_keluarga','blok','nomor_rumah','rt','no_hp','status_warga','tanggal_masuk','tanggal_keluar','keterangan'],text:['nik','no_kk','blok','nomor_rumah','rt','no_hp'],date:['tanggal_lahir','tanggal_masuk','tanggal_keluar'],key:r=>r.nik,
+help:['nik dan no_kk: 16 digit, format Teks (sudah diatur di template).','jenis_kelamin: L atau P.','status_keluarga: KEPALA_KELUARGA, ISTRI, SUAMI, ANAK, ORANG_TUA, LAINNYA (kosong = LAINNYA).','status_warga: AKTIF, KELUAR, MENINGGAL (kosong = AKTIF).','Tanggal: yyyy-mm-dd (contoh 1985-05-17) atau dd/mm/yyyy.','blok, nomor_rumah, rt: harus sama dengan Data Rumah (lihat sheet Daftar Rumah). Impor Data Rumah dan Data KK lebih dulu.','Kolom KK otomatis dibuat/diperbarui dari data warga.']}};
+const xlOk=()=>{if(!window.XLSX){showToast('Pustaka Excel belum termuat. Coba lagi sebentar.','err');return false}return true};
+const xlTools=()=>'<button class="btn g" id="xt">📄 Template</button><button class="btn g" id="xe">⬇ Export</button><button class="btn g" id="xi">⬆ Import</button>';
+function lvx(j,c){c.tools=isAdm()?xlTools():'';listView(c);if(isAdm()){$('#xt').onclick=()=>xlTemplate(j);$('#xe').onclick=()=>xlExport(j);$('#xi').onclick=()=>xlImportUI(j)}}
+function xlSheet(d,rows,rowsN){const ws=XLSX.utils.aoa_to_sheet([d.cols].concat(rows));const N=Math.max(rowsN,rows.length)+1;
+d.cols.forEach((c,ci)=>{if(d.text.includes(c)||d.date.includes(c))for(let r=1;r<=N;r++){const a=XLSX.utils.encode_cell({r:r,c:ci});const cell=ws[a]||{t:'s',v:''};cell.t='s';cell.v=cell.v==null?'':String(cell.v);cell.z='@';ws[a]=cell}});
+ws['!ref']=XLSX.utils.encode_range({s:{r:0,c:0},e:{r:N,c:d.cols.length-1}});ws['!cols']=d.cols.map(c=>({wch:Math.max(14,c.length+2)}));return ws}
+async function xlTemplate(j){if(!xlOk())return;const d=XL[j];let rumah=[];
+if(j!=='RUMAH'){try{rumah=(await api('exportData','RUMAH')).rows}catch(e){return}}
+const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,xlSheet(d,[],500),d.n);
+XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['PETUNJUK PENGISIAN – '+d.n],['Isi data mulai baris 2 pada sheet "'+d.n+'". Jangan mengubah atau menghapus judul kolom (baris 1).'],['Kolom berformat Teks agar angka nol di depan tidak hilang. Jangan memakai tanda petik atau spasi tambahan.']].concat(d.help.map(x=>[x]))),'Petunjuk');
+if(rumah.length)XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['blok','nomor_rumah','rt','nama_pemilik','status_rumah']].concat(rumah.map(r=>[r.blok,r.nomor_rumah,r.rt,r.nama_pemilik,r.status_rumah]))),'Daftar Rumah');
+XLSX.writeFile(wb,'template_'+j.toLowerCase()+'.xlsx');showToast('Template diunduh','ok')}
+async function xlExport(j){if(!xlOk())return;const d=XL[j];let r;try{r=await api('exportData',j)}catch(e){return}
+const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,xlSheet(d,r.rows.map(x=>d.cols.map(c=>x[c]==null?'':String(x[c]))),0),d.n);
+XLSX.writeFile(wb,'export_'+j.toLowerCase()+'_'+new Date().toISOString().slice(0,10)+'.xlsx');showToast(r.rows.length+' baris diekspor','ok')}
+function xlParse(file,j){const d=XL[j];return new Promise((ok,no)=>{const bad=m=>no(Object.assign(new Error(m),{ui:1}));const fr=new FileReader();
+fr.onerror=()=>bad('Gagal membaca file.');
+fr.onload=e=>{try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];if(!ws)return bad('File kosong.');
+const a=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:''});if(a.length<2)return bad('Tidak ada data. Isi mulai baris 2.');
+const h=a[0].map(x=>String(x).trim().toLowerCase().replace(/\s+/g,'_'));const miss=d.cols.filter(c=>!h.includes(c));if(miss.length)return bad('Kolom tidak ditemukan: '+miss.join(', ')+'. Gunakan template.');
+if(a.length-1>5000)return bad('Maksimal 5000 baris per file.');
+const rows=[],errs=[],seen={};
+for(let i=1;i<a.length;i++){const ro=a[i];if(ro.every(v=>String(v).trim()===''))continue;const o={_baris:i+1};
+d.cols.forEach(c=>{let v=ro[h.indexOf(c)];if(typeof v==='number'){v=d.date.includes(c)&&v>20000?new Date(Date.UTC(1899,11,30)+Math.round(v)*864e5).toISOString().slice(0,10):String(v)}o[c]=String(v==null?'':v).trim()});
+const k=d.key(o);if(k&&seen[k]){errs.push({baris:o._baris,pesan:'Data ganda di file (sama dengan baris '+seen[k]+').'});continue}if(k)seen[k]=o._baris;rows.push(o)}
+if(!rows.length&&!errs.length)return bad('Tidak ada baris data.');ok({rows:rows,errs:errs})}catch(x){bad('File tidak dapat dibaca. Pastikan berformat .xlsx.')}};fr.readAsArrayBuffer(file)})}
+async function xlRun(j,rows,mode,dry,label){const id=P.start(label+'…',true);P.tasks[id].real=true;let tambah=0,ubah=0,errors=[];
+try{for(let i=0;i<rows.length;i+=100){const b=rows.slice(i,i+100);const r=await call('importData',[S.token,j,b,{mode:mode,dry:dry}]);tambah+=r.tambah;ubah+=r.ubah;errors=errors.concat(r.errors);P.set(id,Math.min(99,(i+b.length)/rows.length*100),label+' '+Math.min(i+b.length,rows.length)+'/'+rows.length)}}
+catch(e){P.end(id);showError(e);throw e}P.end(id);return{tambah:tambah,ubah:ubah,errors:errors}}
+function xlErrCsv(errs){const q=v=>'"'+String(v).replace(/"/g,'""')+'"',t=['baris,pesan'].concat(errs.map(e=>e.baris+','+q(e.pesan))).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+t],{type:'text/csv'}));a.download='error_import.csv';a.click()}
+function xlImportUI(j){const d=XL[j];if(!xlOk())return;
+modal('Import '+d.n,'<p class="pvn">Gunakan file dari tombol <b>Template</b> atau hasil <b>Export</b>. Data diperiksa dulu sebelum disimpan.</p><label class="fg"><span>File Excel (.xlsx)</span><input type="file" id="xf" accept=".xlsx,.xls"></label><label class="fg"><span>Jika data sudah ada</span><select id="xm"><option value="TAMBAH">Tolak (hanya tambah data baru)</option><option value="UPSERT">Perbarui data yang sudah ada (kolom kosong tidak menghapus data)</option></select></label><div class="mact"><button class="btn g" type="button" onclick="closeModal()">Batal</button><button class="btn" id="xgo" type="button">Periksa File</button></div>');
+$('#xgo').onclick=async()=>{const f=$('#xf').files[0];if(!f){showToast('Pilih file Excel dulu','err');return}const mode=$('#xm').value;
+try{const p=await xlParse(f,j);const res=await xlRun(j,p.rows,mode,true,'Memeriksa data');xlReport(j,p.rows,p.errs.concat(res.errors),res,mode)}catch(e){if(e&&e.ui)showError(e)}}}
+function xlReport(j,rows,errs,res,mode){const bad=new Set(errs.map(e=>e.baris)),valid=rows.filter(r=>!bad.has(r._baris));
+modal('Hasil Pemeriksaan','<div class="card" style="margin-bottom:8px">Baris valid: <b>'+valid.length+'</b> (baru: '+res.tambah+', diperbarui: '+res.ubah+')<br>Baris bermasalah: <b style="color:var(--er)">'+errs.length+'</b></div>'+(errs.length?'<div class="xr"><table class="xt">'+errs.slice(0,100).map(e=>'<tr><td style="white-space:nowrap">Baris '+e.baris+'</td><td>'+esc(e.pesan)+'</td></tr>').join('')+'</table>'+(errs.length>100?'<div class="pvn">…dan '+(errs.length-100)+' lainnya (unduh daftar lengkap).</div>':'')+'</div>':'')+'<div class="pvn">Baris bermasalah dilewati. Perbaiki di Excel lalu import ulang bila perlu.</div><div class="mact"><button class="btn g" type="button" onclick="closeModal()">Tutup</button>'+(errs.length?'<button class="btn g" type="button" id="xerr">Unduh Error</button>':'')+(valid.length?'<button class="btn" type="button" id="xdo">Impor '+valid.length+' Baris</button>':'')+'</div>');
+if(errs.length)$('#xerr').onclick=()=>xlErrCsv(errs);
+if(valid.length)$('#xdo').onclick=async()=>{try{const out=await xlRun(j,valid,mode,false,'Mengimpor data');
+modal('Impor Selesai','<div class="card">✅ Ditambah: <b>'+out.tambah+'</b><br>🔄 Diperbarui: <b>'+out.ubah+'</b><br>⚠️ Gagal: <b>'+out.errors.length+'</b></div><div class="mact"><button class="btn" type="button" onclick="closeModal()">Tutup</button></div>');
+refreshLk();if(window.reload)window.reload()}catch(e){}}}
 PAGES.keuangan=async v=>{v=v||'pemasukan';const my=S.nav,pos=['kas_rt','kas_rw','dana_sosial'].includes(v)?v:'';const k=await api('getKeuangan',{pos:pos});if(my!==S.nav)return;
 let h='<div class="ph"><h2>Keuangan'+(pos?' – '+pos.replace(/_/g,' ').toUpperCase():'')+'</h2><div class="acts"><button class="btn" id="out">+ Pengeluaran</button></div></div><div class="grid">'+Object.keys(k.saldo.pos).map(p=>'<div class="card st"><b>'+rp(k.saldo.pos[p].saldo)+'</b><span>'+p.replace(/_/g,' ')+'</span></div>').join('')+'</div>';
 if(v!=='pengeluaran')h+='<h3>Pemasukan terbaru</h3>'+table([{l:'Tanggal',k:'tanggal'},{l:'Rumah',k:'rumah'},{l:'Jumlah',f:r=>rp(r.jumlah)},{l:'Metode',k:'metode'},{l:'Petugas',k:'petugas'}],k.pemasukan);
@@ -315,7 +365,7 @@ const NAV=[{i:'🏠',t:'Dashboard',p:'dashboard'},{i:'💬',t:'Ruang Obrolan',p:
 {i:'📄',t:'Surat Menyurat',s:[['Pengajuan Surat','surat',''],['Surat Domisili','surat','DOMISILI'],['Surat Pengantar','surat','PENGANTAR'],['Surat Kematian','surat','KEMATIAN'],['Warga Masuk','surat','MASUK'],['Warga Keluar','surat','KELUAR'],['Kontrak/Sewa','surat','KONTRAK']]},
 {i:'📁',t:'Dokumen',p:'dokumen',r:RDR},{i:'📊',t:'Laporan',p:'laporan',r:RDR},{i:'⚙️',t:'Pengaturan',p:'pengaturan'}];
 function buildNav(){const ok=n=>!n.r||n.r.includes(S.user.role);
-$('#side').innerHTML='<h1>🏘️ ADMINISTRASI WARGA GATRA-1</h1>'+NAV.filter(ok).map((n,x)=>n.s?'<a data-x="'+x+'">'+n.i+' '+n.t+' ▾</a><div class="sub" id="sub'+x+'">'+n.s.map(s=>'<a data-p="'+s[1]+'" data-a="'+s[2]+'">'+s[0]+'</a>').join('')+'</div>':'<a data-p="'+n.p+'">'+n.i+' '+n.t+(n.p==='chat'?' <span class="nb" id="cb" hidden></span>':'')+'</a>').join('');
+$('#side').innerHTML='<h1>🏘️ ADMINISTRASI WARGA RW</h1>'+NAV.filter(ok).map((n,x)=>n.s?'<a data-x="'+x+'">'+n.i+' '+n.t+' ▾</a><div class="sub" id="sub'+x+'">'+n.s.map(s=>'<a data-p="'+s[1]+'" data-a="'+s[2]+'">'+s[0]+'</a>').join('')+'</div>':'<a data-p="'+n.p+'">'+n.i+' '+n.t+(n.p==='chat'?' <span class="nb" id="cb" hidden></span>':'')+'</a>').join('');
 $('#side').onclick=e=>{const a=e.target.closest('a');if(!a)return;if(a.dataset.x!==undefined)$('#sub'+a.dataset.x).classList.toggle('open');else showPage(a.dataset.p,a.dataset.a)}}
 function closeNav(){$('#side').classList.remove('open');$('#ov').classList.remove('open')}
 $('#ham').onclick=()=>{$('#side').classList.add('open');$('#ov').classList.add('open')};$('#ov').onclick=closeNav;
